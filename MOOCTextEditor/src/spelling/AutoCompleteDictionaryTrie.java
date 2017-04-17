@@ -1,14 +1,14 @@
 package spelling;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
 
 /** 
  * An trie data structure that implements the Dictionary and the AutoComplete ADT
- * @author You
+ * @author Pradhap Ganesan
  *
  */
 public class AutoCompleteDictionaryTrie implements  Dictionary, AutoComplete {
@@ -39,8 +39,37 @@ public class AutoCompleteDictionaryTrie implements  Dictionary, AutoComplete {
 	 */
 	public boolean addWord(String word)
 	{
-	    //TODO: Implement this method.
-	    return false;
+		validateInput(word);
+		
+		boolean addWord = addWordImpl(word.toLowerCase(),0,root);
+		size = addWord?size+1:size;
+	    return addWord;
+	}
+
+
+	private void validateInput(String word) {
+		if(null == word){
+			throw new NullPointerException("Invalid input");
+		}
+	}
+	
+	private boolean addWordImpl(String word, int index, TrieNode currTrieNode){
+		if (index < 0 || index == word.length()) {
+			if (null != currTrieNode && false == currTrieNode.endsWord()) {
+				currTrieNode.setEndsWord(true);
+				return true;
+			}else{
+				return false;
+			}
+		}
+		
+		if(null == currTrieNode.getChild(word.charAt(index))){
+			currTrieNode = currTrieNode.insert(word.charAt(index));
+		}else{
+			currTrieNode = currTrieNode.getChild(word.charAt(index));
+		}
+
+		return addWordImpl(word,index+1,currTrieNode);
 	}
 	
 	/** 
@@ -49,8 +78,7 @@ public class AutoCompleteDictionaryTrie implements  Dictionary, AutoComplete {
 	 */
 	public int size()
 	{
-	    //TODO: Implement this method
-	    return 0;
+	    return this.size;
 	}
 	
 	
@@ -59,8 +87,36 @@ public class AutoCompleteDictionaryTrie implements  Dictionary, AutoComplete {
 	@Override
 	public boolean isWord(String s) 
 	{
-	    // TODO: Implement this method
-		return false;
+		validateInput(s);
+		return isWordImpl(s.toLowerCase(),0,root);
+	}
+	
+	private boolean isWordImpl(String word, int index, TrieNode currTrieNode){
+		if(index == word.length()){
+			if(null != currTrieNode){
+				return currTrieNode.endsWord();
+			}
+			return false;
+		}
+		if( (currTrieNode = currTrieNode.getChild(word.charAt(index))) != null){
+			return isWordImpl(word,index+1,currTrieNode);
+		}else{
+			return false;
+		}
+	}
+	
+	private TrieNode getPrefixWord(String word, int index, TrieNode currTrieNode){
+		if(null == word){
+			return null;
+		}
+		if(index == word.length()){
+			return currTrieNode;
+		}
+		if( (currTrieNode = currTrieNode.getChild(word.charAt(index))) != null){
+			return getPrefixWord(word,index+1,currTrieNode);
+		}else{
+			return null;
+		}
 	}
 
 	/** 
@@ -101,8 +157,44 @@ public class AutoCompleteDictionaryTrie implements  Dictionary, AutoComplete {
     	 //       Add all of its child nodes to the back of the queue
     	 // Return the list of completions
     	 
-         return null;
+    	 List<String> predictCompletionList = new ArrayList<String>(0);
+    	 TrieNode prefixTrieNode = this.getPrefixWord(prefix,0,this.root);
+    	 if(prefixTrieNode == null || numCompletions==0){
+    		 return predictCompletionList;
+    	 }
+
+    	 List<TrieNode> bfsTrieNodeQueue = new LinkedList<TrieNode>();
+    	 int count = numCompletions;
+    	 enQueue(prefixTrieNode, bfsTrieNodeQueue);
+    	 
+    	 if(null != prefixTrieNode && prefixTrieNode.endsWord()){
+			 predictCompletionList.add(prefixTrieNode.getText());
+			 count--;
+		 }
+    	 
+     	 while(!bfsTrieNodeQueue.isEmpty() && count!=0){
+    		 
+    		 TrieNode trieNode = bfsTrieNodeQueue.remove(0);
+    		 
+    		 if(null != trieNode && trieNode.endsWord()){
+    			 predictCompletionList.add(trieNode.getText());
+    			 count--;
+    		 }
+    		 enQueue(trieNode, bfsTrieNodeQueue);	 
+    	 }
+    	 
+         return predictCompletionList;
      }
+
+
+	private void enQueue(TrieNode prefixTrieNode, List<TrieNode> bfsTrieNodeQueue) {
+		Set<Character> nextChars = prefixTrieNode.getValidNextCharacters();
+    	 Iterator<Character> charsIter = nextChars.iterator();
+    	 while(charsIter.hasNext()){
+    		 char chr = charsIter.next();
+    		 bfsTrieNodeQueue.add(prefixTrieNode.getChild(chr));
+    	 }
+	}
 
  	// For debugging
  	public void printTree()

@@ -34,6 +34,10 @@ public class DocumentBenchmarking {
 		// You can play around with this.
 		int start = 50000;
 		
+		System.out.print("Size"+"\t");
+		System.out.print("BasicDocument"+"\t");
+		System.out.print("EfficientDocument"+"\n");
+		
 		// TODO: Fill in the rest of this method so that it runs two loops
 		// and prints out timing results as described in the assignment 
 		// instructions and following the pseudocode below.
@@ -58,9 +62,39 @@ public class DocumentBenchmarking {
 			 * 6. Print out the time it took to complete the loop in step 5 
 			 *      (on the same line as the first print statement) followed by a newline (\n) 
 			 */  
+			System.out.print(numToCheck+"\t");
+			String text = getStringFromFile(textfile, numToCheck); 
+
+			double baseTimeSeconds = basicDocumentAnalysis(trials, text);
+			System.out.print(baseTimeSeconds+"\t");
 			 
+			double effTimeSeconds = efficientDocumentAnalysis(trials, text);
+
+			System.out.print(effTimeSeconds+"\n");
 		}
 	
+	}
+
+	private static double basicDocumentAnalysis(int trials, String text) {
+		long baseTimeStart = System.nanoTime();
+		for(int i=0;i<trials;i++){
+			Document baseDoc = new BasicDocument(text);			
+			baseDoc.getFleschScore();
+		}
+		long baseTimeEnd = System.nanoTime();
+		double baseTimeSeconds = ((double) (baseTimeEnd-baseTimeStart)) / 1E9;
+		return baseTimeSeconds;
+	}
+
+	private static double efficientDocumentAnalysis(int trials, String text) {
+		long effTimeStart = System.nanoTime();
+		for(int i=0;i<trials;i++){
+			Document effDoc = new EfficientDocument(text);			
+			effDoc.getFleschScore();
+		}
+		long effTimeEnd = System.nanoTime();
+		double effTimeSeconds = ((double) (effTimeEnd-effTimeStart)) / 1E9;
+		return effTimeSeconds;
 	}
 	
 	/** Get a specified number of characters from a text file

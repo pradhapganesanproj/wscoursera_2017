@@ -23,6 +23,8 @@ public class MyLinkedListTester {
 	MyLinkedList<Integer> longerList;
 	MyLinkedList<Integer> list1;
 	
+	MyLinkedList<String> myList1;
+	
 	/**
 	 * @throws java.lang.Exception
 	 */
@@ -42,7 +44,13 @@ public class MyLinkedListTester {
 		list1.add(65);
 		list1.add(21);
 		list1.add(42);
-		
+
+		list1 = new MyLinkedList<Integer>();
+		list1.add(65);
+		list1.add(21);
+		list1.add(42);
+
+		myList1 = new MyLinkedList<String>();
 	}
 
 	
@@ -114,7 +122,26 @@ public class MyLinkedListTester {
 		assertEquals("Remove: check element 0 is correct ", (Integer)21, list1.get(0));
 		assertEquals("Remove: check size is correct ", 2, list1.size());
 		
-		// TODO: Add more tests here
+		try{
+			emptyList.remove(0);
+			fail("Check out of bounds");
+		}catch(IndexOutOfBoundsException e){
+		}
+		
+		try{
+			list1.remove(2);
+			fail("Check out of bounds");
+		}catch(IndexOutOfBoundsException e){
+		}
+		
+		int last = list1.remove(1);
+		assertEquals("Remove: check a is correct ",42, last);
+		assertEquals("Remove: check element 0 is correct ", (Integer)21, list1.get(0));
+		assertEquals("Remove: check size is correct ", 1, list1.size());
+		
+		int onlyOne = list1.remove(0);
+		assertEquals("Remove: check a is correct ", 21, onlyOne);
+		assertEquals("Remove: check size is correct ", 0, list1.size());
 	}
 	
 	/** Test adding an element into the end of the list, specifically
@@ -123,8 +150,12 @@ public class MyLinkedListTester {
 	@Test
 	public void testAddEnd()
 	{
-        // TODO: implement this test
+		myList1.add("0");
+		myList1.add("2");
+		assertEquals("Invalid size ",2,myList1.size());
 		
+		myList1.add(1,"1");//add 4th index
+		assertEquals("Invalid data ","2",myList1.get(myList1.size()-1));
 	}
 
 	
@@ -132,7 +163,17 @@ public class MyLinkedListTester {
 	@Test
 	public void testSize()
 	{
-		// TODO: implement this test
+		myList1.add("0");
+		assertEquals("Invalid size ",1,myList1.size());
+		
+		myList1.remove(0);
+		assertEquals("Invalid size ",0,myList1.size());
+		
+		myList1.add(0,"0");
+		myList1.add("1");
+		myList1.add(2,"2");
+		assertEquals("Invalid size ",3,myList1.size());
+		assertEquals("Invalid data ","2",myList1.get(2));
 	}
 
 	
@@ -144,7 +185,24 @@ public class MyLinkedListTester {
 	@Test
 	public void testAddAtIndex()
 	{
-        // TODO: implement this test
+		myList1.add("2");
+		myList1.add(0,"0");
+		assertEquals("Invalid size ",2,myList1.size());
+
+		myList1.add(1,"1");
+		assertEquals("Invalid data at 1st Index ","1",myList1.get(1));
+		
+		assertEquals("Invalid size ",3,myList1.size());
+		
+		myList1.add(3,"3");//add 3 index
+		assertEquals("Invalid data ","3",myList1.get(myList1.size()-1));
+		
+		try{
+			myList1.add(5,"5");
+			fail("check out of bound");
+		}catch(IndexOutOfBoundsException e){
+			
+		}
 		
 	}
 	
@@ -152,8 +210,15 @@ public class MyLinkedListTester {
 	@Test
 	public void testSet()
 	{
-	    // TODO: implement this test
-	    
+		try{
+			list1.set(3,30);
+			fail("check out of bound");
+		}catch(IndexOutOfBoundsException e){
+			
+		}
+		
+		assertEquals("Invalid data ",(Integer)65,list1.set(0,50));
+		assertEquals("Invalid data ",(Integer)42,list1.set(2,22));
 	}
 	
 	

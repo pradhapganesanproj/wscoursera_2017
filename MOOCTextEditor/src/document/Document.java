@@ -1,5 +1,6 @@
 package document;
 
+import java.text.DecimalFormat;
 /** 
  * A class that represents a text document
  * @author UC San Diego Intermediate Programming MOOC team
@@ -67,7 +68,52 @@ public abstract class Document {
 		// TODO: Implement this method so that you can call it from the 
 	    // getNumSyllables method in BasicDocument (module 2) and 
 	    // EfficientDocument (module 3).
-	    return 0;
+		if(null == word || word.length()==0){
+			return 0;
+		}
+		 int countSullables = 0;
+		 // I just gave a try using regEx - just learning purpose
+		 //countSullables = countUsingRegEx(word.toLowerCase());
+		 
+		 word = word.toLowerCase();
+
+		 //if the given word endswith e then remove the e and count syllable later consider e.
+		 String wordTmp = word.endsWith("e")?word.substring(0, word.length() > 1 ? word.length() - 1 : 0):word;
+
+		 boolean conseq = false;		
+		 for(char chr : wordTmp.toCharArray()){
+			 if("aeiouy".indexOf(chr) > -1){
+				 if(!conseq){
+					 countSullables = countSullables+1;
+					 conseq = true;
+				 }
+			 }else{
+				 conseq = false;
+			 }
+		 }
+
+		 //already removed e and counted syllable; consider words ends with only one e
+		 if(word.endsWith("e")) {
+			 if(countSullables==0){
+				 countSullables=1;
+			 }
+		 }
+
+	    return countSullables;
+	}
+
+	private int countUsingRegEx(String word) {
+		int countSullables;
+		if(word.endsWith("e")){
+			 String tmpWord = word.substring(0, word.length() > 1 ? word.length() - 1 : 0);
+			 countSullables = getTokens(tmpWord,"[aeiouy]+").size();
+			 if(countSullables == 0 ){
+				 countSullables = countSullables + 1;
+			 }
+		 }else{
+			 countSullables = getTokens(word,"[aeiouy]+").size();
+		 }
+		return countSullables;
 	}
 	
 	/** A method for testing
@@ -132,9 +178,37 @@ public abstract class Document {
 	{
 	    // TODO: You will play with this method in week 1, and 
 		// then implement it in week 2
-	    return 0.0;
+		
+		double numWords = getNumWords();
+		double numSentences = getNumSentences();
+		double numSyllables = getNumSyllables();
+		
+		double getFleshScore = 206.835 - 1.015 * (numWords/numSentences) - 84.6 * (numSyllables/numWords);
+		
+		getFleshScore = tuncToOneDecimal(getFleshScore);
+		
+	    return getFleshScore;
 	}
-	
-	
+
+	private double tuncToOneDecimal(double getFleshScore) {
+		try {
+			DecimalFormat df = new DecimalFormat("#.#");      
+			getFleshScore = Double.valueOf(df.format(getFleshScore));
+		} catch (NumberFormatException e) {	}
+		return getFleshScore;
+	}
+	//Overloaded
+	private List<String> getTokens(String text, String pattern)
+	{
+		ArrayList<String> tokens = new ArrayList<String>();
+		Pattern tokSplitter = Pattern.compile(pattern);
+		Matcher m = tokSplitter.matcher(text);
+		
+		while (m.find()) {
+			tokens.add(m.group());
+		}
+		
+		return tokens;
+	}	
 	
 }
