@@ -76,7 +76,18 @@ public class NearbyWords implements SpellingSuggest {
 	 * @return
 	 */
 	public void insertions(String s, List<String> currentList, boolean wordsOnly ) {
-		// TODO: Implement this method  
+		for (int si = 0; si <=s.length(); si++) {
+			String s1 = s.substring(0, si)!=null?s.substring(0, si).toLowerCase():"";
+			String s2 = s.substring(si)!=null?s.substring(si).toLowerCase():"";
+			for (int i = 0; i < 26; i++) {
+				char chr = (char) (i + 97);
+				String sConcat = new String(s1 + chr + s2);
+				if(!currentList.contains(sConcat) 
+						&& (!wordsOnly || dict.isWord(sConcat))){
+					currentList.add(sConcat);	
+				}
+			}
+		}
 	}
 
 	/** Add to the currentList Strings that are one character deletion away
@@ -87,7 +98,14 @@ public class NearbyWords implements SpellingSuggest {
 	 * @return
 	 */
 	public void deletions(String s, List<String> currentList, boolean wordsOnly ) {
-		// TODO: Implement this method
+		for(int si=0;si<s.length();si++){
+			StringBuffer strBuf = new StringBuffer(s);
+			String deleteCharStr = strBuf.deleteCharAt(si).toString();
+			if(!currentList.contains(deleteCharStr)
+					&&(!wordsOnly || dict.isWord(deleteCharStr))){
+				currentList.add(deleteCharStr);
+			}
+		}
 	}
 
 	/** Add to the currentList Strings that are one character deletion away
@@ -109,11 +127,28 @@ public class NearbyWords implements SpellingSuggest {
 		// insert first node
 		queue.add(word);
 		visited.add(word);
-					
-		// TODO: Implement the remainder of this method, see assignment for algorithm
-		
-		return retList;
+		int countNumSuggestion = 0;
+		int breakThreshold = 0;
+		while(!queue.isEmpty() && countNumSuggestion < numSuggestions){
+			String processWord = queue.remove(0);
+			List<String> nearbyWords = distanceOne(processWord, true);
 
+			for(String nearbyWord : nearbyWords){
+				if (!visited.contains(nearbyWord)) {
+					visited.add(nearbyWord);
+					queue.add(nearbyWord);
+					if (dict.isWord(nearbyWord)) {
+						retList.add(nearbyWord);
+					}
+				}
+			}
+			countNumSuggestion = retList.size();
+			breakThreshold++;
+			if(breakThreshold>THRESHOLD){
+				break;
+			}
+		}
+		return retList;
 	}	
 
    public static void main(String[] args) {

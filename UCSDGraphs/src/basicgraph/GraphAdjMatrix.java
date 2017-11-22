@@ -1,9 +1,8 @@
 package basicgraph;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /** A class that implements a directed graph. 
@@ -105,7 +104,17 @@ public class GraphAdjMatrix extends Graph {
 	 */	
 	public List<Integer> getDistance2(int v) {
 		// XXX Implement this method in week 2
-		return null;
+		//Set<Integer> twoHopNeighbor = new HashSet<Integer>();
+		List<Integer> twoHopNeighbors = new ArrayList<Integer>();
+		for(int i=0; i<getNumVertices();i++){
+			for(int j=0; j<getNumVertices() && adjMatrix[v][i]>0; j++){
+				if(adjMatrix[i][j]>0){
+					twoHopNeighbors.add(j);
+				}
+			}
+		}
+		
+		return twoHopNeighbors;
 	}
 	
 	/**
